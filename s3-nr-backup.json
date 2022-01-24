@@ -1,0 +1,365 @@
+[
+    {
+        "id": "3fa599f5ac4d602a",
+        "type": "comment",
+        "z": "35d3fbcf445fd1e5",
+        "name": "README: ",
+        "info": "AUTO S3 Backup:\n\nThis Flow is designed to grab the working Node-Red folder, and the front end web site code located at /home/ubuntu/www, the mongo db, and zip and send the zipped content to the associated S3 bucket.\n\nThe flow depends on an external package of S3cmd, so you must install this as well.\n\nSee the contents in `INFO / INSTALL` comment node for detailed installation instructions.\n\nAfter this, you will need to enter your access\nkey into the .s3cfg file located at /home/<username>/.s3cfg\n\nYou can generate this file by running `s3cmd --configure` in the terminal command line.\n\n\nSee the contents of `INFO / Install` comment node for more details on installation.\n\n",
+        "x": 100,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "7440ca9b3288c2bb",
+        "type": "comment",
+        "z": "35d3fbcf445fd1e5",
+        "name": "INFO / Install",
+        "info": "-Install s3cmd on the this host server.\n`sudo apt-get install s3cmd`\n\nrun:   `s3cmd --configure`\ngive your credentials for the s3 bucket.\n\n\n-Install zip\n`sudo apt-get install zip`\n\nWhen triggered, this flow will zip the contents of the .node-red folder and also the www contents in the user home folder.  Ignoring the `node_modules` folder.\n\nAnother script will utilize s3cmd to upload this file to your S3 bucket with dynamic timestamp in the file name.\n\nThe server side ~/backup-www.zip file will be static named and overwritten everytime this backup is generated... This avoids accumulations of backup files on the server.  The S3 bucket will carry all these backup variations with each timestamp attached.\n\nThere will be another S3 copy uploading the same copy to a \"***-latest.zip\" file for easy id of the latest backup.\n",
+        "x": 250,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "dd5ec52ef73c4f33",
+        "type": "group",
+        "z": "35d3fbcf445fd1e5",
+        "name": "BackUp Node-red and WWW ",
+        "style": {
+            "label": true,
+            "stroke": "#6f2fa0",
+            "fill": "#dbcbe7",
+            "label-position": "n",
+            "color": "#ffffff"
+        },
+        "nodes": [
+            "9b2e93c6c53e0fda",
+            "0bb65238035ac647",
+            "115ba90e362a5a92",
+            "46f919158d5211b6",
+            "57b16a842ccbcb0b",
+            "95e66b99fde84589",
+            "e02cb2bbb60bad7a",
+            "5c9dabaa088177b5",
+            "0b010faaf5448b4d",
+            "1ab6599f0b8f2f55",
+            "f94739d0c2a2eb0d",
+            "b4f636184d7ae71a",
+            "288fba13116cc782",
+            "2454f837d44e4a58",
+            "30a32ab0223b848b"
+        ],
+        "x": 34,
+        "y": 151.5,
+        "w": 1172,
+        "h": 217
+    },
+    {
+        "id": "9b2e93c6c53e0fda",
+        "type": "inject",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "00 12 * * *",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 200,
+        "wires": [
+            [
+                "57b16a842ccbcb0b"
+            ]
+        ]
+    },
+    {
+        "id": "0bb65238035ac647",
+        "type": "exec",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "ZIP",
+        "x": 550,
+        "y": 200,
+        "wires": [
+            [
+                "1ab6599f0b8f2f55"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "115ba90e362a5a92",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "Attach flows.json s3 command line",
+        "func": "\n\nmsg.payload = \"s3cmd put /home/\" + msg.linux_user + \"/backup-www.zip s3://\" + msg.bucket_name +  \"/backups/\" + msg.site_name + \"/\" + msg.newfile\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 220,
+        "y": 240,
+        "wires": [
+            [
+                "46f919158d5211b6"
+            ]
+        ]
+    },
+    {
+        "id": "46f919158d5211b6",
+        "type": "exec",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 470,
+        "y": 260,
+        "wires": [
+            [
+                "f94739d0c2a2eb0d"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "57b16a842ccbcb0b",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "CONFIG",
+        "func": "//This only works on Linux for now.\n\n//Change these to your settings:\nmsg.site_name = \"sitename\";\nmsg.bucket_name = \"some-bucket\";\nmsg.linux_user = \"ubuntu\"; //user name of linux user\n\nmsg.newfile = msg.site_name + \"_\" + Date.now() + \".zip\";\n\n//Gets Node-Red and www file to zip file.\nmsg.payload = 'zip /home/' + msg.linux_user + '/backup-www.zip -r /home/' + msg.linux_user + '/www /home/' + msg.linux_user + '/.node-red -x \"/home/' + msg.linux_user + '/.node-red/node_modules/*\" \"/home/' + msg.linux_user + '/www/.git/*\" \"/home/' + msg.linux_user + '/.node-red/.git/*\"';\nmsg.www_file_location = \"/home/\" + msg.linux_user +   \"/backup-www.zip\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 420,
+        "y": 200,
+        "wires": [
+            [
+                "0bb65238035ac647"
+            ]
+        ]
+    },
+    {
+        "id": "95e66b99fde84589",
+        "type": "exec",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "command": "",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 870,
+        "y": 240,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "e02cb2bbb60bad7a",
+        "type": "exec",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "MongoDB Backup To File",
+        "x": 310,
+        "y": 320,
+        "wires": [
+            [
+                "288fba13116cc782"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "5c9dabaa088177b5",
+        "type": "exec",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "command": "",
+        "addpay": true,
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 1070,
+        "y": 320,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "0b010faaf5448b4d",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "Attach flows.json",
+        "func": "\nmsg.newfile = msg.site_name + \"_db_\" + Date.now() + \".archive\";\n\n\n\nmsg.payload = \"s3cmd put /home/\" +  msg.linux_user  + \"/\" + msg.site_name +  \"-db.archive s3://\" +  msg.bucket_name    +\"/backups/\" +  msg.site_name + \"/database/\" + msg.newfile\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 320,
+        "wires": [
+            [
+                "2454f837d44e4a58"
+            ]
+        ]
+    },
+    {
+        "id": "1ab6599f0b8f2f55",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "",
+        "func": "msg.filename = \"/home/\" + msg.linux_user + \"/backup-www.zip\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 200,
+        "wires": [
+            [
+                "115ba90e362a5a92"
+            ]
+        ]
+    },
+    {
+        "id": "f94739d0c2a2eb0d",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "",
+        "func": "msg.payload = \"s3cmd put /home/\" + msg.linux_user + \"/backup-www.zip s3://\" + msg.bucket_name +  \"/backups/\" + msg.site_name +  \"/\" + msg.site_name + \"-latest.zip\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 680,
+        "y": 240,
+        "wires": [
+            [
+                "95e66b99fde84589"
+            ]
+        ]
+    },
+    {
+        "id": "b4f636184d7ae71a",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "",
+        "func": "msg.payload  = \"mongodump --archive=/home/\" + msg.linux_user +  \"/\" + msg.site_name + \"-db.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 140,
+        "y": 300,
+        "wires": [
+            [
+                "e02cb2bbb60bad7a"
+            ]
+        ]
+    },
+    {
+        "id": "288fba13116cc782",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "",
+        "func": "msg.filename = \"/home/\" + msg.linux_user +  \"/\"  + msg.site_name +  \"-db.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 320,
+        "wires": [
+            [
+                "0b010faaf5448b4d"
+            ]
+        ]
+    },
+    {
+        "id": "2454f837d44e4a58",
+        "type": "function",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "",
+        "func": "msg.filename = \"/home/\" + msg.linux_user +  \"/\"  + msg.site_name +  \"-db.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 880,
+        "y": 320,
+        "wires": [
+            [
+                "5c9dabaa088177b5"
+            ]
+        ]
+    },
+    {
+        "id": "30a32ab0223b848b",
+        "type": "comment",
+        "z": "35d3fbcf445fd1e5",
+        "g": "dd5ec52ef73c4f33",
+        "name": "Triggers Backups to S3 Amazon",
+        "info": "",
+        "x": 210,
+        "y": 200,
+        "wires": []
+    }
+]
