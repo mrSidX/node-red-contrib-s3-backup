@@ -1,0 +1,554 @@
+[
+    {
+        "id": "e5d6089dac48653d",
+        "type": "exec",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "MongoDB Backup To File",
+        "x": 433.99999237060547,
+        "y": 2075.0000406503677,
+        "wires": [
+            [
+                "f26008914e546c3b",
+                "5f2b29a00f560a7a"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "8e2f5773e4bd6143",
+        "type": "exec",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 1353.9999923706055,
+        "y": 2115.0000406503677,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d440f37c75f09859",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "Attach flows.json",
+        "func": "\nmsg.newfile = msg.site_domain + \"-\" + Date.now() + \"-mongodb.archive\";\n\n\n\n\nmsg.payload = \"s3cmd put /home/\" +  msg.linux_user  + \"/\" + msg.site_domain +  \"-latest-mongodb.archive s3://\" +  msg.bucket_name    +\"/backups/\" +  msg.site_domain + \"/database/\" + msg.newfile\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 973.9999923706055,
+        "y": 2115.0000406503677,
+        "wires": [
+            [
+                "f045925ededc179e"
+            ]
+        ]
+    },
+    {
+        "id": "3e21118f3b35b315",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "func": "//gets the default \"latest\" file created\nmsg.filename = \"/home/\" + msg.linux_user +  \"/\"  + msg.site_domain +  \"-latest-mongodb.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 803.9999923706055,
+        "y": 2115.0000406503677,
+        "wires": [
+            [
+                "d440f37c75f09859"
+            ]
+        ]
+    },
+    {
+        "id": "f045925ededc179e",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "func": "msg.filename = \"/home/\" + msg.linux_user +  \"/\"  + msg.site_domain +  \"-db.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1163.9999923706055,
+        "y": 2115.0000406503677,
+        "wires": [
+            [
+                "8e2f5773e4bd6143"
+            ]
+        ]
+    },
+    {
+        "id": "eca6abb721660f0a",
+        "type": "inject",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payloadType": "date",
+        "x": 365.99999237060547,
+        "y": 1611.0000534057617,
+        "wires": [
+            [
+                "20f5d4268d30047e"
+            ]
+        ]
+    },
+    {
+        "id": "e01f6f0123d5657b",
+        "type": "exec",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "ZIP",
+        "x": 715.9999923706055,
+        "y": 1591.0000534057617,
+        "wires": [
+            [
+                "6617ad5414999423"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a33b7dcbae13b187",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "Attach flows.json s3 command line",
+        "func": "\n\nmsg.payload = \"s3cmd put /home/\" + msg.linux_user + \"/\" + msg.site_domain + \".zip s3://\" + msg.bucket_name +  \"/backups/\" + msg.site_domain + \"/\" + msg.newfile\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1005.9999923706055,
+        "y": 1811.0000534057617,
+        "wires": [
+            [
+                "70cc9f9afa911265"
+            ]
+        ]
+    },
+    {
+        "id": "70cc9f9afa911265",
+        "type": "exec",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 1295.9999923706055,
+        "y": 1811.0000534057617,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "20f5d4268d30047e",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "CONFIG",
+        "func": "\n//Change these to your settings:///////////////////////////////\n//Saving to AWS Cloud\nmsg.save_versions = false;\nmsg.save_latest_version = true;\nmsg.save_database = false;\nmsg.save_database_versions = false;\nmsg.save_latest_database = false;\n\n//GENERAL\nmsg.site_name = \"sitename\";\nmsg.site_domain = \"sitename.org\"\nmsg.bucket_name = \"bucket-name\";\nmsg.linux_user = \"ubuntu\";\n///////////////////////////////////////////////////////////////\n\n\nmsg.newfile = msg.site_name + \"_\" + Date.now() + \".zip\";\n\n//Gets Node-Red and www file to zip file.\n//exlude .git and node_modules\nmsg.payload = 'zip -r /home/' + msg.linux_user + '/' + msg.site_domain + '.zip /home/' + msg.linux_user + '/www/' + msg.site_domain + ' /home/' + msg.linux_user + '/.node-red -x \"/home/' + msg.linux_user + '/.node-red/node_modules/*\" \"/home/' + msg.linux_user + '/www/'  + msg.site_domain + '/.git/*\" \"/home/' + msg.linux_user + '/.node-red/.git/*\"';\nmsg.www_file_location = \"/home/\" + msg.linux_user + \"/\" + msg.site_domain + \".zip\"\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 585.9999923706055,
+        "y": 1591.0000534057617,
+        "wires": [
+            [
+                "e01f6f0123d5657b"
+            ]
+        ]
+    },
+    {
+        "id": "18ec054b8029b6ec",
+        "type": "exec",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 1295.9999923706055,
+        "y": 1871.0000534057617,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "cb786a8016770aae",
+        "type": "exec",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "command": "",
+        "addpay": "payload",
+        "append": "",
+        "useSpawn": "false",
+        "timer": "",
+        "winHide": false,
+        "oldrc": false,
+        "name": "S3 bucket out via S3cmd",
+        "x": 1353.9999923706055,
+        "y": 2055.0000406503677,
+        "wires": [
+            [],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "4515f57d27f8f455",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "Attach flows.json",
+        "func": "\n//msg.newfile = msg.site_name + \"_db_\" + Date.now() + \".archive\";\n\n\n\nmsg.payload = \"s3cmd put /home/\" +  msg.linux_user  + \"/\" + msg.site_domain +  \"-latest-mongodb.archive s3://\" +  msg.bucket_name    +\"/backups/\" +  msg.site_domain + \"/database/\" + msg.site_domain + \"-latest-mongodb.archive\"\n\n\n\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 973.9999923706055,
+        "y": 2055.0000406503677,
+        "wires": [
+            [
+                "afa62675c4bedfc8"
+            ]
+        ]
+    },
+    {
+        "id": "6617ad5414999423",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "Create Filename",
+        "func": "\n\n// msg.newfile has the date timestamp \n// msg.filename is the reference to the file on the server to copy to cloud\nmsg.filename = \"/home/\" + msg.linux_user + \"/\" + msg.site_domain + \".zip\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 885.9999923706055,
+        "y": 1591.0000534057617,
+        "wires": [
+            [
+                "dbd1a7694feb0e99",
+                "cc1d48c929f89368",
+                "4c2764be99e358cc"
+            ]
+        ]
+    },
+    {
+        "id": "d0093b0327160d99",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "Upload Latest to AWS",
+        "func": "msg.payload = \"s3cmd put /home/\" + msg.linux_user + \"/\" + msg.site_domain + \".zip s3://\" + msg.bucket_name +  \"/backups/\" + msg.site_domain +  \"/\" + msg.site_domain + \"-latest.zip\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1065.9999923706055,
+        "y": 1871.0000534057617,
+        "wires": [
+            [
+                "18ec054b8029b6ec"
+            ]
+        ]
+    },
+    {
+        "id": "c549301b9a4dce44",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "func": "msg.filename = \"/home/\" + msg.linux_user +  \"/\"  + msg.site_domain +  \"-latest-mongodb.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 803.9999923706055,
+        "y": 2055.0000406503677,
+        "wires": [
+            [
+                "4515f57d27f8f455"
+            ]
+        ]
+    },
+    {
+        "id": "afa62675c4bedfc8",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "func": "msg.filename = \"/home/\" + msg.linux_user +  \"/\"  + msg.site_domain +  \"-latest-mongodb.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1163.9999923706055,
+        "y": 2055.0000406503677,
+        "wires": [
+            [
+                "cb786a8016770aae"
+            ]
+        ]
+    },
+    {
+        "id": "2be7148cea2ba502",
+        "type": "comment",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "Triggers Backups to S3 Amazon",
+        "info": "",
+        "x": 393.99999237060547,
+        "y": 1515.0000406503677,
+        "wires": []
+    },
+    {
+        "id": "dbd1a7694feb0e99",
+        "type": "switch",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "save_current",
+        "property": "save_latest_version",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 875.9999923706055,
+        "y": 1871.0000534057617,
+        "wires": [
+            [
+                "d0093b0327160d99"
+            ]
+        ]
+    },
+    {
+        "id": "cc1d48c929f89368",
+        "type": "switch",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "save_versions",
+        "property": "save_versions",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 765.9999923706055,
+        "y": 1811.0000534057617,
+        "wires": [
+            [
+                "a33b7dcbae13b187"
+            ]
+        ]
+    },
+    {
+        "id": "4c2764be99e358cc",
+        "type": "switch",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "save_database",
+        "property": "save_database",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 385.99999237060547,
+        "y": 1951.0000534057617,
+        "wires": [
+            [
+                "613c2ad9a0be5f9a"
+            ]
+        ]
+    },
+    {
+        "id": "5f2b29a00f560a7a",
+        "type": "switch",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "save versions",
+        "property": "save_database_versions",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 643.9999923706055,
+        "y": 2115.0000406503677,
+        "wires": [
+            [
+                "3e21118f3b35b315"
+            ]
+        ]
+    },
+    {
+        "id": "f26008914e546c3b",
+        "type": "switch",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "save current",
+        "property": "save_latest_database",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 653.9999923706055,
+        "y": 2055.0000406503677,
+        "wires": [
+            [
+                "c549301b9a4dce44"
+            ]
+        ]
+    },
+    {
+        "id": "3db231a815c3af54",
+        "type": "function",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "generate Latest",
+        "func": "\n\n//database only saves versions\nmsg.payload = 'mongodump --forceTableScan --uri=' + msg.sites.streamtacular_com.mongo_atlas_uri + \" --archive=/home/\"+ msg.linux_user + \"/\" + msg.site_domain + \"-latest-mongodb.archive\"\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 403.99999237060547,
+        "y": 2035.0000406503677,
+        "wires": [
+            [
+                "e5d6089dac48653d"
+            ]
+        ]
+    },
+    {
+        "id": "613c2ad9a0be5f9a",
+        "type": "credentials",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "props": [
+            {
+                "value": "sites.streamtacular_com.mongo_atlas_uri",
+                "type": "msg"
+            }
+        ],
+        "credentials": {},
+        "x": 393.99999237060547,
+        "y": 1995.0000406503677,
+        "wires": [
+            [
+                "3db231a815c3af54"
+            ]
+        ]
+    },
+    {
+        "id": "4140754c3246c798",
+        "type": "debug",
+        "z": "67f684251d44031a",
+        "g": "dc3bbf4119ae230a",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 633.9999923706055,
+        "y": 1975.0000406503677,
+        "wires": []
+    }
+]
