@@ -498,7 +498,7 @@
         "z": "67f684251d44031a",
         "g": "dc3bbf4119ae230a",
         "name": "generate Latest",
-        "func": "\n\n//database only saves versions\nmsg.payload = 'mongodump --forceTableScan --uri=' + msg.sites.streamtacular_com.mongo_atlas_uri + \" --archive=/home/\"+ msg.linux_user + \"/\" + msg.site_domain + \"-latest-mongodb.archive\"\nreturn msg;",
+        "func": "\n\n//database only saves versions\nmsg.payload = 'mongodump --forceTableScan --uri=' + msg.sites.mysitename_com.mongo_atlas_uri + \" --archive=/home/\"+ msg.linux_user + \"/\" + msg.site_domain + \"-latest-mongodb.archive\"\nreturn msg;",
         "outputs": 1,
         "noerr": 0,
         "initialize": "",
@@ -520,7 +520,7 @@
         "name": "",
         "props": [
             {
-                "value": "sites.streamtacular_com.mongo_atlas_uri",
+                "value": "sites.mysitename_com.mongo_atlas_uri",
                 "type": "msg"
             }
         ],
