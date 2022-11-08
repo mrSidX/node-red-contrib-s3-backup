@@ -42,3 +42,31 @@ The server side ~/backup-www.zip file will be static named and overwritten every
 There will be another S3 copy uploading the same copy to a "***-latest.zip" file for easy id of the latest backup.
 
 
+
+UPDATE: 
+
+Created a means of dumping Mongo DB Atlas to the database archival process.
+You will need to install the ```node-red-contrib-credentials``` node to store your sensitive mongo-db url that contains the username and password.
+You will need to enter your "credentials" into the credentials node.
+
+
+If  you have a mongodb atlas cloud use this:
+Configure the node like this:
+
+```
+Private:  "mongodb+srv://your url to your mongo/<database name>"
+To: msg.sites.yoursitename_com.mondo_atlas_uri
+```
+
+
+This will do a ```mongodump``` of the remote database and put a copy to the local drive then send to S3 bucket.
+
+You may need to modify the flow to locate your www files... In my case, the www files are in ```~/www/mysitename.com/public_html```  and symlinked to apache ```/var/www/mysitename.com/public_html```
+
+Also made more optional conditions in the CONFIG file to omit version copying.  You can set ```true``` or ```false``` in these settings to either copy versions for each the www folder, and database, or just copy to a "latest" file.
+
+
+
+
+
+
